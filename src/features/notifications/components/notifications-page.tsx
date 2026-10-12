@@ -46,7 +46,18 @@ export default function NotificationsPage() {
             createdAt={notification.createdAt}
             actions={notification.actions}
             onMarkAsRead={markAsRead}
-            onAction={(notifId, actionId) => {
+            onAction={(notifId, actionId, actionType) => {
+              // Prefer the backend link (前端跳转地址) when present.
+              const target = notifications.find((n) => n.id === notifId)?.url;
+              if (actionType === 'redirect' && target) {
+                markAsRead(notifId);
+                if (/^https?:\/\//.test(target)) {
+                  window.open(target, '_blank', 'noopener,noreferrer');
+                } else {
+                  router.push(target);
+                }
+                return;
+              }
               const route = actionRoutes[actionId];
               if (route) {
                 markAsRead(notifId);

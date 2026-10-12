@@ -45,6 +45,7 @@ import {
   IconHelpCircle,
   IconInfoCircle,
   IconItalic,
+  IconLanguage,
   IconLayoutDashboard,
   IconLayoutKanban,
   IconLayoutSidebar,
@@ -182,6 +183,7 @@ export const Icons = {
   brightness: IconBrightness,
   laptop: IconDeviceLaptop,
   palette: IconPalette,
+  language: IconLanguage,
 
   // Commerce / Plans
   billing: IconCreditCard,

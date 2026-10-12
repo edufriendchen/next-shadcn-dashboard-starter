@@ -10,6 +10,8 @@ export interface PermissionCheck {
 
 export interface NavItem {
   title: string;
+  /** Key under `nav.items` in the message files; falls back to `title` when omitted */
+  titleKey?: string;
   url: string;
   disabled?: boolean;
   external?: boolean;
@@ -24,6 +26,8 @@ export interface NavItem {
 
 export interface NavGroup {
   label: string;
+  /** Key under `nav.groups` in the message files; falls back to `label` when omitted */
+  labelKey?: string;
   items: NavItem[];
 }
 

@@ -174,9 +174,9 @@ export const NotificationCard: FC<NotificationCardProps> = ({
             </div>
           )}
 
-          {/* Timestamp */}
+          {/* Timestamp — always pinned to the right, with or without actions */}
           {createdAt && (
-            <span className='text-muted-foreground/60 inline-block text-[11px]'>
+            <span className='text-muted-foreground/60 ml-auto inline-block text-[11px]'>
               {formatDate(createdAt)}
             </span>
           )}

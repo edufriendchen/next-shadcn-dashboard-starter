@@ -6,6 +6,7 @@ import SearchInput from '../search-input';
 import { ThemeSelector } from '../themes/theme-selector';
 import { ThemeModeToggle } from '../themes/theme-mode-toggle';
 import CtaGithub from './cta-github';
+import { LocaleSelector } from '../i18n/locale-selector';
 import { NotificationCenter } from '@/features/notifications/components/notification-center';
 
 export default function Header() {
@@ -25,6 +26,9 @@ export default function Header() {
         <ThemeModeToggle />
         <div className='hidden sm:block'>
           <ThemeSelector />
+        </div>
+        <div className='hidden sm:block'>
+          <LocaleSelector />
         </div>
         <NotificationCenter />
       </div>

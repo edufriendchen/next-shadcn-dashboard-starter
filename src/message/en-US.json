@@ -1,0 +1,395 @@
+{
+  "common": {
+    "appName": "Next Shadcn Dashboard",
+    "actions": {
+      "add": "Add",
+      "addNew": "Add New",
+      "create": "Create",
+      "save": "Save",
+      "saveChanges": "Save changes",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "continue": "Continue",
+      "delete": "Delete",
+      "edit": "Edit",
+      "update": "Update",
+      "view": "View",
+      "viewAll": "View all",
+      "close": "Close",
+      "search": "Search",
+      "reset": "Reset",
+      "clear": "Clear",
+      "back": "Back",
+      "goBack": "Go back",
+      "next": "Next",
+      "previous": "Previous",
+      "download": "Download",
+      "upload": "Upload",
+      "copy": "Copy",
+      "copied": "Copied",
+      "retry": "Try again",
+      "openMenu": "Open menu",
+      "send": "Send"
+    },
+    "status": {
+      "loading": "Loading...",
+      "saving": "Saving...",
+      "submitting": "Submitting...",
+      "empty": "No data",
+      "noResults": "No results found",
+      "error": "Error",
+      "success": "Success",
+      "required": "Required",
+      "optional": "Optional"
+    },
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "email": "Email",
+      "password": "Password",
+      "price": "Price",
+      "category": "Category",
+      "role": "Role",
+      "status": "Status",
+      "photo": "Photo",
+      "createdAt": "Created at",
+      "updatedAt": "Updated at",
+      "actions": "Actions"
+    }
+  },
+  "nav": {
+    "groups": {
+      "overview": "Overview",
+      "elements": "Elements"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "workspaces": "Workspaces",
+      "teams": "Teams",
+      "product": "Product",
+      "users": "Users",
+      "organizations": "Organizations",
+      "kanban": "Kanban",
+      "chat": "Chat",
+      "aiChat": "AI Chat",
+      "forms": "Forms",
+      "basicForm": "Basic Form",
+      "multiStepForm": "Multi-Step Form",
+      "sheetForm": "Sheet & Dialog",
+      "advancedForm": "Advanced Patterns",
+      "reactQuery": "React Query",
+      "icons": "Icons",
+      "pro": "Pro",
+      "exclusive": "Exclusive",
+      "account": "Account",
+      "profile": "Profile",
+      "notifications": "Notifications",
+      "billing": "Billing",
+      "login": "Login"
+    },
+    "toggleSidebar": "Toggle sidebar",
+    "searchPlaceholder": "Search or jump to..."
+  },
+  "table": {
+    "rowsPerPage": "Rows per page",
+    "pageInfo": "Page {page} of {total}",
+    "selectedRows": "{selected} of {total} row(s) selected",
+    "totalItems": "{count, plural, one {# item} other {# items}}",
+    "goToFirstPage": "Go to first page",
+    "goToPreviousPage": "Go to previous page",
+    "goToNextPage": "Go to next page",
+    "goToLastPage": "Go to last page",
+    "toggleColumns": "Toggle columns",
+    "searchColumns": "Search columns...",
+    "resetFilters": "Reset filters",
+    "clearFilter": "Clear {title} filter",
+    "filter": "Filter",
+    "filterBy": "Filter {title}",
+    "selectAll": "Select all",
+    "selectRow": "Select row",
+    "noResults": "No results."
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign out",
+    "logOut": "Log out",
+    "login": "Login",
+    "signInTitle": "Authentication | Sign In",
+    "signInDescription": "Sign In page for authentication.",
+    "signUpTitle": "Authentication | Sign Up",
+    "signUpDescription": "Sign Up page for authentication.",
+    "signedInSuccess": "Signed In Successfully!",
+    "continueWithGithub": "Continue with GitHub",
+    "orContinueWith": "Or continue with",
+    "agreementPrefix": "By clicking continue, you agree to our",
+    "termsOfService": "Terms of Service",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
+    "upgradeAccount": "Upgrade your account",
+    "account": "Account",
+    "notSignedIn": "You are not signed in",
+    "signInToManage": "Sign in to manage your account"
+  },
+  "overview": {
+    "greeting": "Hi, Welcome back 👋",
+    "tabs": {
+      "overview": "Overview",
+      "analytics": "Analytics",
+      "reports": "Reports",
+      "notifications": "Notifications"
+    },
+    "cards": {
+      "totalRevenue": "Total Revenue",
+      "newCustomers": "New Customers",
+      "activeAccounts": "Active Accounts",
+      "growthRate": "Growth Rate",
+      "trendingUp": "Trending up this month",
+      "trendingDown": "Down {percent}% this period",
+      "strongRetention": "Strong user retention",
+      "acquisitionNeedsAttention": "Acquisition needs attention",
+      "engagementExceedTargets": "Engagement exceed targets",
+      "meetsGrowthProjections": "Meets growth projections",
+      "visitorsLast6Months": "Visitors for the last 6 months",
+      "steadyPerformance": "Steady performance increase"
+    },
+    "charts": {
+      "areaTitle": "Area Chart - Stacked",
+      "areaDescription": "Showing total visitors for the last 6 months",
+      "barTitle": "Bar Chart - Interactive",
+      "barDescription": "January - June 2025",
+      "pieTitle": "Pie Chart - Donut with Text",
+      "pieDescription": "January - June 2024",
+      "totalVisitors": "Total Visitors",
+      "monthRange": "January - June {year}"
+    },
+    "recentSales": {
+      "title": "Recent Sales",
+      "description": "You made {count} sales this month."
+    },
+    "statsError": {
+      "title": "Error",
+      "description": "Failed to load this section."
+    }
+  },
+  "products": {
+    "title": "Products",
+    "description": "Manage products (React Query + nuqs table pattern.)",
+    "addNew": "Add New",
+    "createTitle": "Create New Product",
+    "editTitle": "Edit Product",
+    "searchPlaceholder": "Search products...",
+    "fields": {
+      "images": "Images",
+      "name": "Name",
+      "namePlaceholder": "Enter product name",
+      "category": "Category",
+      "categoryPlaceholder": "Select a category",
+      "price": "Price",
+      "pricePlaceholder": "Enter price",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter product description"
+    },
+    "toast": {
+      "created": "Product created",
+      "createFailed": "Couldn't create product. Try again.",
+      "updated": "Product updated",
+      "updateFailed": "Couldn't update product. Try again.",
+      "deleted": "Product deleted successfully",
+      "deleteFailed": "Failed to delete product"
+    },
+    "deleteDialog": {
+      "title": "Are you sure?",
+      "description": "This will permanently delete the product. This action cannot be undone."
+    }
+  },
+  "users": {
+    "title": "Users",
+    "description": "Manage users (React Query + nuqs table pattern.)",
+    "addNew": "Add User",
+    "createTitle": "Create User",
+    "editTitle": "Edit User",
+    "searchPlaceholder": "Search users...",
+    "toast": {
+      "created": "User created",
+      "createFailed": "Couldn't create user. Try again.",
+      "updated": "User updated",
+      "updateFailed": "Couldn't update user. Try again.",
+      "deleted": "User deleted successfully",
+      "deleteFailed": "Failed to delete user"
+    }
+  },
+  "kanban": {
+    "title": "Kanban",
+    "description": "Manage tasks with drag and drop",
+    "columns": {
+      "backlog": "Backlog",
+      "inProgress": "In Progress",
+      "review": "Review",
+      "done": "Done"
+    },
+    "newTask": {
+      "trigger": "Add New Task",
+      "title": "Add New Task",
+      "description": "What do you want to get done today?",
+      "titleLabel": "Task title",
+      "titlePlaceholder": "Task title...",
+      "descriptionLabel": "Task description",
+      "descriptionPlaceholder": "Description...",
+      "titleRequired": "Please enter a task title.",
+      "submit": "Add Task"
+    },
+    "taskCount": "{count, plural, one {# task} other {# tasks}}",
+    "deleteTask": "Delete task",
+    "moveTask": "Move task"
+  },
+  "chat": {
+    "title": "Chat",
+    "messenger": "Messenger",
+    "searchConversations": "Search conversations",
+    "noConversations": "No conversations found",
+    "noMessages": "No messages yet",
+    "composerPlaceholder": "Message {name} (Enter to send, Shift+Enter for newline)",
+    "send": "Send",
+    "online": "Online",
+    "offline": "Offline"
+  },
+  "aiChat": {
+    "title": "AI Chat",
+    "assistant": "Release Assistant",
+    "emptyHint": "Press Send to stream the scripted response.",
+    "inputPlaceholder": "Ask anything...",
+    "send": "Send",
+    "stop": "Stop",
+    "thinking": "Thinking..."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "View and manage all your notifications.",
+    "markAllAsRead": "Mark all as read",
+    "markAsRead": "Mark as read",
+    "unreadCount": "{count, plural, one {# unread} other {# unread}}",
+    "empty": "No notifications",
+    "emptyCenter": "No notifications yet",
+    "viewAll": "View all notifications"
+  },
+  "billing": {
+    "title": "Billing & Plans",
+    "description": "Manage your subscription and usage limits for {organization}",
+    "noOrganization": "No Organization Selected",
+    "noOrganizationHint": "Select or create a workspace to manage billing.",
+    "availablePlans": "Available Plans",
+    "availablePlansDescription": "Choose a plan that fits your organization's needs",
+    "currentPlan": "Current plan",
+    "upgrade": "Upgrade",
+    "manageSubscription": "Manage subscription"
+  },
+  "workspaces": {
+    "title": "Workspaces",
+    "description": "Manage your workspaces and switch between them",
+    "team": {
+      "title": "Team Management",
+      "description": "Manage your workspace team, members, roles, security and more."
+    },
+    "create": "Create workspace",
+    "switch": "Switch workspace",
+    "noWorkspace": "No workspace selected"
+  },
+  "profile": {
+    "title": "Profile",
+    "description": "Manage your account settings and preferences."
+  },
+  "exclusive": {
+    "title": "Exclusive",
+    "description": "Pro plan only content.",
+    "upgradeTitle": "Upgrade to Pro",
+    "upgradeDescription": "This content is available on the Pro plan."
+  },
+  "forms": {
+    "basic": {
+      "title": "Basic Form",
+      "description": "A comprehensive form demo with all field types."
+    },
+    "multiStep": {
+      "title": "Multi-Step Form",
+      "description": "Multi-step wizard form pattern.",
+      "stepOf": "Step {current} of {total}"
+    },
+    "sheet": {
+      "title": "Sheet & Dialog Forms",
+      "description": "Form patterns inside sheets and dialogs with external submit buttons."
+    },
+    "advanced": {
+      "title": "Advanced Form Patterns",
+      "description": "Linked fields, async validation, dynamic rows, nested objects, cross-field validation, and form-level errors."
+    },
+    "toast": {
+      "productCreated": "Product created successfully!",
+      "teamRegistered": "Team registered successfully!",
+      "feedbackSubmitted": "Feedback submitted!",
+      "actionCompleted": "Action completed successfully!",
+      "somethingWentWrong": "Something went wrong.",
+      "reviewBeforeContinuing": "Please review before continuing.",
+      "usefulInformation": "Here is some useful information."
+    },
+    "upload": {
+      "dragAndDrop": "Drag and drop files here, or click to select files",
+      "singleFileOnly": "Cannot upload more than 1 file at a time",
+      "maxFiles": "Cannot upload more than {maxFiles} files",
+      "fileRejected": "File {name} was rejected",
+      "removeFile": "Remove file"
+    }
+  },
+  "reactQuery": {
+    "title": "React Query",
+    "description": "Server prefetch + client hydration + suspense query pattern."
+  },
+  "elements": {
+    "icons": {
+      "title": "Icons",
+      "searchPlaceholder": "Search icons...",
+      "browseTabler": "Browse Tabler Icons",
+      "noResults": "No icons found"
+    }
+  },
+  "theme": {
+    "label": "Theme",
+    "selectPlaceholder": "Select a theme",
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "locale": {
+    "label": "Language",
+    "switch": "Switch Language",
+    "en-US": "English",
+    "zh-CN": "简体中文"
+  },
+  "errors": {
+    "notFound": {
+      "code": "404",
+      "title": "Something's missing",
+      "description": "Sorry, the page you are looking for doesn't exist.",
+      "goBack": "Go back",
+      "backToHome": "Back to Home"
+    },
+    "global": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. The issue has been reported.",
+      "retry": "Try again"
+    },
+    "section": {
+      "title": "Failed to load",
+      "description": "This section couldn't be loaded.",
+      "retry": "Try again"
+    },
+    "accessDenied": {
+      "title": "Access denied",
+      "description": "You don't have permission to view this page."
+    },
+    "network": "Network error. Please check your connection.",
+    "unknown": "An unknown error occurred."
+  }
+}
