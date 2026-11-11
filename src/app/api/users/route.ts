@@ -1,45 +1,89 @@
 // ============================================================
-// Route Handler — Users (list + create)
+// Route Handler — Users (list) — BFF to authboot-server
 // ============================================================
-// Used with Pattern 2 (Route Handlers + ORM) or Pattern 3 (BFF).
-//
-// Fullstack (ORM): Replace fakeUsers calls with your ORM
-//   const users = await db.query.users.findMany({ ... })
-//
-// BFF (proxy): Replace with fetch to your external backend
-//   const res = await fetch(`${BACKEND_URL}/users?${searchParams}`, {
-//     headers: { Authorization: `Bearer ${token}` }
-//   })
-//   return NextResponse.json(await res.json())
-//
-// Current: Mock (in-memory fake data for demo/prototyping)
-// ============================================================
+// GET  → GET {BACKEND_URL}/api/v1/admin/organizations/{orgId}/users
+//        (orgId from the active_org cookie; pagination mapped to the
+//         backend's page/page_size; response normalized to the table shape)
+// POST → 501 — the backend exposes no admin "create user" endpoint.
 
-import { fakeUsers } from '@/constants/mock-api-users';
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { authbootBaseUrl, getAccessToken } from '@/lib/auth';
+import { ACTIVE_ORG_COOKIE, parseOrgId } from '@/lib/auth-shared';
+import { normalizeUsers } from '@/lib/user-mapper';
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = request.nextUrl;
+  const token = await getAccessToken();
+  if (!token) {
+    return NextResponse.json(
+      { success: false, message: 'Not authenticated', users: [], total_users: 0 },
+      { status: 200 }
+    );
+  }
 
+  const cookieStore = await cookies();
+  const orgId = parseOrgId(cookieStore.get(ACTIVE_ORG_COOKIE)?.value);
+  if (!orgId) {
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'No active organization',
+        users: [],
+        total_users: 0,
+        offset: 0,
+        limit: 10
+      },
+      { status: 200 }
+    );
+  }
+
+  const { searchParams } = request.nextUrl;
   const page = Number(searchParams.get('page') ?? 1);
   const limit = Number(searchParams.get('limit') ?? 10);
-  const roles = searchParams.get('roles') ?? undefined;
-  const search = searchParams.get('search') ?? undefined;
-  const sort = searchParams.get('sort') ?? undefined;
+  const pageSize = Number.isInteger(limit) && limit > 0 ? limit : 10;
 
-  const data = await fakeUsers.getUsers({
-    page,
-    limit,
-    roles,
-    search,
-    sort
+  let res: Response;
+  try {
+    // organization_id must also appear as a query param: the backend IDL
+    // binds ListUsersRequest via form/query (the path annotation is missing).
+    res = await fetch(
+      `${authbootBaseUrl()}/admin/organizations/${orgId}/users?organization_id=${orgId}&page=${page}&page_size=${pageSize}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  } catch {
+    return NextResponse.json(
+      { success: false, message: 'Failed to reach the backend', users: [], total_users: 0 },
+      { status: 200 }
+    );
+  }
+
+  const body = await res.json().catch(() => null);
+  if (!res.ok || !body || body.code !== 0) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: body?.message ?? 'Failed to load users',
+        users: [],
+        total_users: 0
+      },
+      { status: 200 }
+    );
+  }
+
+  return NextResponse.json({
+    success: true,
+    time: new Date().toISOString(),
+    message: body.message,
+    total_users: body.total ?? 0,
+    offset: (page - 1) * pageSize,
+    limit: pageSize,
+    users: normalizeUsers(body.users)
   });
-
-  return NextResponse.json(data);
 }
 
-export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const data = await fakeUsers.createUser(body);
-  return NextResponse.json(data, { status: 201 });
+export async function POST() {
+  return NextResponse.json(
+    { success: false, message: '创建用户接口尚未在 authboot-server 实现' },
+    { status: 501 }
+  );
 }

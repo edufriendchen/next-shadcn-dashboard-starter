@@ -1,47 +1,54 @@
 // ============================================================
-// User Service — Data Access Layer
+// User Service — Data Access Layer (BFF → authboot-server)
 // ============================================================
-// This is the ONLY file you modify when connecting to your backend.
-// Queries (queries.ts) and components import from here — they never change.
-//
-// Pick your pattern and replace the function bodies below:
-//
-// 1. Server Actions + ORM (Prisma / Drizzle / Supabase)
-//    → Add 'use server' at the top of this file
-//    → Call your ORM directly in each function
-//
-// 2. Route Handlers + ORM
-//    → import { apiClient } from '@/lib/api-client'
-//    → return apiClient<UsersResponse>('/users?...')
-//    → Replace mock calls in route handlers (src/app/api/users/) with ORM
-//
-// 3. BFF — Route Handlers proxy to external backend (Laravel, Go, etc.)
-//    → import { apiClient } from '@/lib/api-client'
-//    → return apiClient<UsersResponse>('/users?...')
-//    → Route handlers proxy requests to your external backend service
-//
-// 4. Direct external API (frontend-only, no Next.js backend)
-//    → const res = await fetch('https://your-api.com/users?...')
-//    → return res.json()
-//
-// Current: Mock (in-memory fake data for demo/prototyping)
-// ============================================================
+// All calls go through the /api/users BFF routes, which proxy to
+// authboot-server's admin organization-user API using the signed-in
+// admin's token + active organization.
 
-import { fakeUsers } from '@/constants/mock-api-users';
-import type { UserFilters, UsersResponse, UserMutationPayload } from './types';
+import { apiClient } from '@/lib/api-client';
+import type {
+  UserFilters,
+  UsersResponse,
+  UserByIdResponse,
+  UserAddressesResponse,
+  UserMutationPayload
+} from './types';
 
 export async function getUsers(filters: UserFilters): Promise<UsersResponse> {
-  return fakeUsers.getUsers(filters);
+  const query = new URLSearchParams();
+  if (filters.page) query.set('page', String(filters.page));
+  if (filters.limit) query.set('limit', String(filters.limit));
+  if (filters.search) query.set('search', filters.search);
+  if (filters.sort) query.set('sort', filters.sort);
+
+  const qs = query.toString();
+  return apiClient<UsersResponse>(`/users${qs ? `?${qs}` : ''}`);
+}
+
+export async function getUserById(id: number): Promise<UserByIdResponse> {
+  return apiClient<UserByIdResponse>(`/users/${id}`);
+}
+
+export async function getUserAddresses(id: number): Promise<UserAddressesResponse> {
+  return apiClient<UserAddressesResponse>(`/users/${id}/addresses`);
 }
 
 export async function createUser(data: UserMutationPayload) {
-  return fakeUsers.createUser(data);
+  return apiClient(`/users`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
 }
 
 export async function updateUser(id: number, data: UserMutationPayload) {
-  return fakeUsers.updateUser(id, data);
+  return apiClient(`/users/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
 }
 
 export async function deleteUser(id: number) {
-  return fakeUsers.deleteUser(id);
+  return apiClient(`/users/${id}`, {
+    method: 'DELETE'
+  });
 }

@@ -1,7 +1,11 @@
-import { delay } from '@/constants/mock-api';
+import { Suspense } from 'react';
 import { PieGraph } from '@/features/overview/components/pie-graph';
+import { PieGraphSkeleton } from '@/features/overview/components/pie-graph-skeleton';
 
 export default async function Stats() {
-  await delay(1000);
-  return <PieGraph />;
+  return (
+    <Suspense fallback={<PieGraphSkeleton />}>
+      <PieGraph />
+    </Suspense>
+  );
 }

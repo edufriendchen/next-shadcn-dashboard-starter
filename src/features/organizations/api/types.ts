@@ -73,3 +73,38 @@ export type LeaveOrganizationResponse = {
   code: number;
   message: string;
 };
+
+// ---- Organization login methods (OAuth provider configs) ----
+// Mirrors oauth.proto. `settings` holds provider-specific credentials; the
+// backend masks sensitive values (containing '*') on read.
+export type OAuthProviderConfig = {
+  organization_id: number;
+  provider: string;
+  settings: Record<string, string>;
+  enabled: boolean;
+  created_at: number;
+  updated_at: number;
+};
+
+export type OAuthConfigPayload = {
+  settings: Record<string, string>;
+  enabled: boolean;
+};
+
+export type ListOAuthConfigsResponse = {
+  code: number;
+  message: string;
+  configs: OAuthProviderConfig[];
+  total: number;
+};
+
+export type OAuthConfigResponse = {
+  code: number;
+  message: string;
+  config: OAuthProviderConfig;
+};
+
+export type DeleteOAuthConfigResponse = {
+  code: number;
+  message: string;
+};

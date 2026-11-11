@@ -20,6 +20,7 @@
 
 import * as Sentry from '@sentry/nextjs';
 import { NextRequest, NextResponse } from 'next/server';
+import { AUTH_COOKIE_ACCESS } from '@/lib/auth-shared';
 
 const BACKEND_URL = process.env.BACKEND_URL;
 const DEFAULT_TIMEOUT_MS = 10_000;
@@ -91,10 +92,16 @@ export async function proxyToBackend(
     }
   }
 
-  // Fallback test token (dev only) — used only when no auth was provided
-  // by the incoming request or options.headers.
-  if (TEST_TOKEN && process.env.NODE_ENV !== 'production' && !headers.has('authorization')) {
-    headers.set('authorization', `Bearer ${TEST_TOKEN}`);
+  // Prefer the signed-in admin's access token (auth_token cookie) over the
+  // dev test token, so BFF routes authenticate against authboot-server with
+  // the real session once the user has logged in.
+  if (!headers.has('authorization')) {
+    const authToken = request.cookies.get(AUTH_COOKIE_ACCESS)?.value;
+    if (authToken) {
+      headers.set('authorization', `Bearer ${authToken}`);
+    } else if (TEST_TOKEN && process.env.NODE_ENV !== 'production') {
+      headers.set('authorization', `Bearer ${TEST_TOKEN}`);
+    }
   }
 
   const init: RequestInit = { method, headers };

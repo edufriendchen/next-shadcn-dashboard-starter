@@ -1,7 +1,11 @@
-import { delay } from '@/constants/mock-api';
+import { Suspense } from 'react';
 import { AreaGraph } from '@/features/overview/components/area-graph';
+import { AreaGraphSkeleton } from '@/features/overview/components/area-graph-skeleton';
 
 export default async function AreaStats() {
-  await delay(2000);
-  return <AreaGraph />;
+  return (
+    <Suspense fallback={<AreaGraphSkeleton />}>
+      <AreaGraph />
+    </Suspense>
+  );
 }

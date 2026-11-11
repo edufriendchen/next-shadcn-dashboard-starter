@@ -1,9 +1,9 @@
 'use client';
 
-import { useAuth, useOrganizationList } from '@clerk/nextjs';
+import { useAuth } from '@/components/auth/auth-provider';
 import { Icons } from '@/components/icons';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import {
   DropdownMenu,
@@ -21,41 +21,34 @@ import {
   SidebarMenuItem,
   useSidebar
 } from '@/components/ui/sidebar';
-import { useEffect } from 'react';
+import { useState } from 'react';
 
 export function OrgSwitcher() {
   const { isMobile, state } = useSidebar();
   const router = useRouter();
-  const { isLoaded, setActive, userMemberships } = useOrganizationList({
-    userMemberships: {
-      infinite: true,
-      keepPreviousData: false
-    }
-  });
-
-  const { orgId } = useAuth();
-
-  useEffect(() => {
-    if (userMemberships?.revalidate) {
-      void userMemberships.revalidate();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only revalidate when org changes, not on every userMemberships ref change
-  }, [orgId]);
+  const { organizations, activeOrganizationId, isLoaded, switchOrg } = useAuth();
+  const [switchingId, setSwitchingId] = useState<number | null>(null);
 
   // Get the currently active organization
-  const activeOrganization = userMemberships?.data?.find(
-    (membership) => membership.organization.id === orgId
-  )?.organization;
+  const activeOrganization =
+    organizations.find((org) => org.id === activeOrganizationId) ?? organizations[0];
 
   // Handle organization switch
-  const handleOrganizationSwitch = async (organizationId: string) => {
-    if (orgId === organizationId || !setActive) {
-      return; // Already active or setActive not available
+  const handleOrganizationSwitch = async (organizationId: number) => {
+    if (activeOrganizationId === organizationId || switchingId !== null) {
+      return; // Already active or a switch is in flight
     }
+    setSwitchingId(organizationId);
     try {
-      await setActive({ organization: organizationId });
+      const result = await switchOrg(organizationId);
+      if (!result.success) {
+        toast.error(result.message);
+      }
     } catch (error) {
       console.error('Failed to switch organization:', error);
+      toast.error('Failed to switch organization');
+    } finally {
+      setSwitchingId(null);
     }
   };
 
@@ -85,7 +78,7 @@ export function OrgSwitcher() {
   }
 
   // Show create organization option if no organizations
-  if (!userMemberships?.data || userMemberships.data.length === 0) {
+  if (!organizations || organizations.length === 0) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
@@ -120,10 +113,7 @@ export function OrgSwitcher() {
     );
   }
 
-  // Use active organization or first organization as fallback
-  const displayOrganization = activeOrganization || userMemberships.data[0]?.organization;
-
-  if (!displayOrganization) {
+  if (!activeOrganization) {
     return null;
   }
 
@@ -140,12 +130,11 @@ export function OrgSwitcher() {
             }
           >
             <div className='bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg'>
-              {displayOrganization.hasImage && displayOrganization.imageUrl ? (
-                <Image
-                  src={displayOrganization.imageUrl}
-                  alt={displayOrganization.name}
-                  width={32}
-                  height={32}
+              {activeOrganization.logo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={activeOrganization.logo}
+                  alt={activeOrganization.name}
                   className='size-full object-cover'
                 />
               ) : (
@@ -159,10 +148,9 @@ export function OrgSwitcher() {
                   : 'visible max-w-full opacity-100'
               }`}
             >
-              <span className='truncate font-medium'>{displayOrganization.name}</span>
+              <span className='truncate font-medium'>{activeOrganization.name}</span>
               <span className='text-muted-foreground truncate text-xs'>
-                {userMemberships.data.find((m) => m.organization.id === displayOrganization.id)
-                  ?.role || 'Organization'}
+                {activeOrganization.code || 'Organization'}
               </span>
             </div>
             <Icons.chevronsUpDown
@@ -185,30 +173,30 @@ export function OrgSwitcher() {
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuGroup>
-              {userMemberships.data.map((membership, index) => {
-                const isActive = membership.organization.id === orgId;
+              {organizations.map((org, index) => {
+                const isActive = org.id === activeOrganizationId;
                 return (
                   <DropdownMenuItem
-                    key={membership.id}
-                    onClick={() => handleOrganizationSwitch(membership.organization.id)}
+                    key={org.id}
+                    onClick={() => handleOrganizationSwitch(org.id)}
                     className='gap-2 p-2'
                   >
                     <div className='flex size-6 items-center justify-center overflow-hidden rounded-md border'>
-                      {membership.organization.hasImage && membership.organization.imageUrl ? (
-                        <Image
-                          src={membership.organization.imageUrl}
-                          alt={membership.organization.name}
-                          width={24}
-                          height={24}
-                          className='size-full object-cover'
-                        />
+                      {org.logo ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={org.logo} alt={org.name} className='size-full object-cover' />
                       ) : (
                         <Icons.galleryVerticalEnd className='size-3.5 shrink-0' />
                       )}
                     </div>
-                    {membership.organization.name}
-                    {isActive && <Icons.check className='ml-auto size-4' />}
-                    {!isActive && <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>}
+                    {org.name}
+                    {switchingId === org.id ? (
+                      <Icons.spinner className='text-muted-foreground ml-auto size-4 animate-spin' />
+                    ) : isActive ? (
+                      <Icons.check className='ml-auto size-4' />
+                    ) : (
+                      <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                    )}
                   </DropdownMenuItem>
                 );
               })}

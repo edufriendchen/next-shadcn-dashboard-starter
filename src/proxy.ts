@@ -1,11 +1,20 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { AUTH_COOKIE_ACCESS } from '@/lib/auth-shared';
 
-const isProtectedRoute = createRouteMatcher(['/dashboard(.*)']);
+const isProtectedRoute = (req: NextRequest) => req.nextUrl.pathname.startsWith('/dashboard');
 
-export default clerkMiddleware(async (auth, req: NextRequest) => {
-  if (isProtectedRoute(req)) await auth.protect();
-});
+export default function middleware(req: NextRequest) {
+  if (isProtectedRoute(req)) {
+    const hasSession = req.cookies.has(AUTH_COOKIE_ACCESS);
+    if (!hasSession) {
+      const signInUrl = new URL('/auth/sign-in', req.nextUrl.origin);
+      signInUrl.searchParams.set('redirect_url', req.nextUrl.pathname);
+      return NextResponse.redirect(signInUrl);
+    }
+  }
+  return NextResponse.next();
+}
+
 export const config = {
   matcher: [
     // Skip Next.js internals and all static files, unless found in search params

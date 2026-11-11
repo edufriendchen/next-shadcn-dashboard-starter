@@ -1,6 +1,6 @@
 'use client';
-import { ClerkProvider } from '@clerk/nextjs';
 import React from 'react';
+import { AuthProvider } from '@/components/auth/auth-provider';
 import { ActiveLocaleProvider } from '../i18n/active-locale';
 import { ActiveThemeProvider } from '../themes/active-theme';
 import QueryProvider from './query-provider';
@@ -19,26 +19,9 @@ export default function Providers({
     <>
       <ActiveThemeProvider initialTheme={activeThemeValue}>
         <ActiveLocaleProvider initialLocale={activeLocaleValue}>
-          <ClerkProvider
-            appearance={{
-              variables: {
-                colorPrimary: 'var(--primary)',
-                colorPrimaryForeground: 'var(--primary-foreground)',
-                colorDanger: 'var(--destructive)',
-                colorBackground: 'var(--card)',
-                colorForeground: 'var(--foreground)',
-                colorMuted: 'var(--muted)',
-                colorMutedForeground: 'var(--muted-foreground)',
-                colorInput: 'var(--input)',
-                colorInputForeground: 'var(--foreground)',
-                colorBorder: 'var(--border)',
-                colorRing: 'var(--ring)',
-                fontFamily: 'var(--font-sans)'
-              }
-            }}
-          >
+          <AuthProvider>
             <QueryProvider>{children}</QueryProvider>
-          </ClerkProvider>
+          </AuthProvider>
         </ActiveLocaleProvider>
       </ActiveThemeProvider>
     </>

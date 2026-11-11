@@ -12,6 +12,7 @@ import {
 import { deleteUserMutation } from '../../api/mutations';
 import type { User } from '../../api/types';
 import { Icons } from '@/components/icons';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -24,6 +25,7 @@ interface CellActionProps {
 export function CellAction({ data }: CellActionProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const router = useRouter();
 
   const deleteMutation = useMutation({
     ...deleteUserMutation,
@@ -55,6 +57,9 @@ export function CellAction({ data }: CellActionProps) {
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
           </DropdownMenuGroup>
           <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => router.push(`/dashboard/users/${data.id}`)}>
+              <Icons.eye className='mr-2 h-4 w-4' /> View
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setEditOpen(true)}>
               <Icons.edit className='mr-2 h-4 w-4' /> Update
             </DropdownMenuItem>

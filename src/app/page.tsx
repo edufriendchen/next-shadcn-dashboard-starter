@@ -1,12 +1,7 @@
-import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
-export default async function Page() {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return redirect('/auth/sign-in');
-  } else {
-    redirect('/dashboard/overview');
-  }
+// Landing route: the middleware protects /dashboard, so unauthenticated
+// visitors are already sent to /auth/sign-in before reaching here.
+export default function Page() {
+  redirect('/dashboard/overview');
 }

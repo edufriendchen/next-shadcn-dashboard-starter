@@ -10,3 +10,12 @@ export const organizationSchema = z.object({
 });
 
 export type OrganizationFormValues = z.infer<typeof organizationSchema>;
+
+// Workspace settings — the General card edits name/code only (the logo is
+// uploaded separately via the logo endpoint, so it is not a form field).
+export const workspaceGeneralSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  code: z.string().min(1, 'Code is required')
+});
+
+export type WorkspaceGeneralFormValues = z.infer<typeof workspaceGeneralSchema>;

@@ -9,81 +9,74 @@ import {
   ChartTooltip,
   ChartTooltipContent
 } from '@/components/ui/chart';
-import { Badge } from '@/components/ui/badge';
-import { Icons } from '@/components/icons';
-
-const chartData = [
-  { month: 'January', desktop: 186, mobile: 80 },
-  { month: 'February', desktop: 305, mobile: 200 },
-  { month: 'March', desktop: 237, mobile: 120 },
-  { month: 'April', desktop: 73, mobile: 190 },
-  { month: 'May', desktop: 209, mobile: 130 },
-  { month: 'June', desktop: 214, mobile: 140 }
-];
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { dashboardQueryOptions, isOrgDashboard } from '@/features/overview/api/queries';
+import { getActiveOrgId } from '@/features/overview/api/service';
 
 const chartConfig = {
-  desktop: {
-    label: 'Desktop',
+  logins: {
+    label: 'Logins',
     color: 'var(--chart-1)'
-  },
-  mobile: {
-    label: 'Mobile',
-    color: 'var(--chart-2)'
   }
 } satisfies ChartConfig;
 
+/**
+ * 7-day daily login trend, from the org-scoped AuthBoot dashboard. Falls
+ * back to an empty state when no organization is active.
+ */
 export function BarGraph() {
+  const orgId = getActiveOrgId();
+  const { data } = useSuspenseQuery(dashboardQueryOptions(orgId));
+  const org = isOrgDashboard(data) ? data : null;
+  const chartData = (org?.login_trend_7d ?? []).map((point) => ({
+    date: point.date,
+    logins: point.count
+  }));
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          Bar Chart - Multiple
-          <Badge variant='outline'>
-            <Icons.trendingDown />
-            -5.2%
-          </Badge>
-        </CardTitle>
-        <CardDescription>January - June 2025</CardDescription>
+        <CardTitle>Daily Logins</CardTitle>
+        <CardDescription>Login count for the last 7 days</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData}>
-            <rect
-              x='0'
-              y='0'
-              width='100%'
-              height='85%'
-              fill='url(#default-multiple-pattern-dots)'
-            />
-            <defs>
-              <DottedBackgroundPattern />
-            </defs>
-            <XAxis
-              dataKey='month'
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator='dashed' hideLabel />}
-            />
-            <Bar
-              dataKey='desktop'
-              color='var(--chart-1)'
-              fill='var(--color-desktop)'
-              shape={<CustomHatchedBar isHatched={false} />}
-              radius={4}
-            />
-            <Bar
-              dataKey='mobile'
-              fill='var(--color-mobile)'
-              shape={<CustomHatchedBar />}
-              radius={4}
-            />
-          </BarChart>
-        </ChartContainer>
+        {org && chartData.length > 0 ? (
+          <ChartContainer config={chartConfig}>
+            <BarChart accessibilityLayer data={chartData}>
+              <rect
+                x='0'
+                y='0'
+                width='100%'
+                height='85%'
+                fill='url(#default-multiple-pattern-dots)'
+              />
+              <defs>
+                <DottedBackgroundPattern />
+              </defs>
+              <XAxis
+                dataKey='date'
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                tickFormatter={(value: string) => value.slice(5)}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator='dashed' hideLabel />}
+              />
+              <Bar
+                dataKey='logins'
+                fill='var(--color-logins)'
+                shape={<CustomHatchedBar isHatched={false} />}
+                radius={4}
+              />
+            </BarChart>
+          </ChartContainer>
+        ) : (
+          <div className='text-muted-foreground flex h-[220px] items-center justify-center text-sm'>
+            Organization-level trend data appears once a workspace is active.
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -96,7 +89,6 @@ const CustomHatchedBar = (
   }
 ) => {
   const { fill, x, y, width, height, dataKey } = props;
-
   const isHatched = props.isHatched ?? true;
 
   return (
@@ -128,6 +120,7 @@ const CustomHatchedBar = (
     </>
   );
 };
+
 const DottedBackgroundPattern = () => {
   return (
     <pattern

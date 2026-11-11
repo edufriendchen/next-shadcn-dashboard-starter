@@ -17,7 +17,11 @@ import type {
   ListOrganizationsResponse,
   DeleteOrganizationResponse,
   UploadOrganizationLogoResponse,
-  LeaveOrganizationResponse
+  LeaveOrganizationResponse,
+  ListOAuthConfigsResponse,
+  OAuthConfigResponse,
+  OAuthConfigPayload,
+  DeleteOAuthConfigResponse
 } from './types';
 
 function buildQuery(filters: OrganizationFilters): string {
@@ -68,6 +72,36 @@ export async function leaveOrganization(id: number): Promise<LeaveOrganizationRe
   return apiClient<LeaveOrganizationResponse>(`/organizations/${id}/leave`, {
     method: 'POST'
   });
+}
+
+// ---- Login methods (per-organization OAuth provider configs) ----
+
+export async function getOAuthConfigs(id: number): Promise<ListOAuthConfigsResponse> {
+  return apiClient<ListOAuthConfigsResponse>(`/organizations/${id}/oauth`);
+}
+
+export async function setOAuthConfig(
+  id: number,
+  provider: string,
+  data: OAuthConfigPayload
+): Promise<OAuthConfigResponse> {
+  return apiClient<OAuthConfigResponse>(
+    `/organizations/${id}/oauth/${encodeURIComponent(provider)}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    }
+  );
+}
+
+export async function deleteOAuthConfig(
+  id: number,
+  provider: string
+): Promise<DeleteOAuthConfigResponse> {
+  return apiClient<DeleteOAuthConfigResponse>(
+    `/organizations/${id}/oauth/${encodeURIComponent(provider)}`,
+    { method: 'DELETE' }
+  );
 }
 
 // Logo upload is multipart/form-data — bypass apiClient so the browser sets

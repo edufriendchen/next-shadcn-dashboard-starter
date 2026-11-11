@@ -6,29 +6,19 @@ export const workspacesInfoContent: InfobarContent = {
     {
       title: 'Overview',
       description:
-        'The Workspaces page allows you to manage your workspaces and switch between them. This feature is powered by Clerk Organizations, which enables multi-tenant workspace management. You can view all available workspaces, create new ones, and switch your active workspace.',
-      links: [
-        {
-          title: 'Clerk Organizations Documentation',
-          url: 'https://clerk.com/docs/organizations/overview'
-        }
-      ]
+        'The Workspaces page allows you to manage your workspaces and switch between them. Workspaces are backed by the AuthBoot organization API — you can view all available workspaces, create new ones, and switch your active workspace.',
+      links: []
     },
     {
       title: 'Creating Workspaces',
       description:
-        'To create a new workspace, click the "Create Organization" button. You will be prompted to enter a workspace name and configure initial settings. Once created, you can switch to the new workspace and start managing it.',
-      links: [
-        {
-          title: 'Multi-tenant Authentication Guide',
-          url: 'https://clerk.com/blog/how-to-build-multitenant-authentication-with-clerk'
-        }
-      ]
+        'To create a new workspace, click the "Create Organization" button. You will be prompted to enter a workspace name and code. Once created, you can switch to the new workspace and start managing it.',
+      links: []
     },
     {
       title: 'Switching Workspaces',
       description:
-        'You can switch between workspaces by clicking on a workspace in the list. The selected workspace becomes your active organization context, and all organization-specific features will use this workspace.',
+        'You can switch between workspaces by clicking on a workspace in the list. Switching calls the AuthBoot switch-organization API, which re-scopes your access token to the chosen workspace.',
       links: []
     },
     {
@@ -40,13 +30,8 @@ export const workspacesInfoContent: InfobarContent = {
     {
       title: 'Server-Side Permission Checks',
       description:
-        "This application follows Clerk's recommended patterns for multi-tenant authentication. Server-side permission checks ensure that users can only access resources for their active organization.",
-      links: [
-        {
-          title: 'Clerk Organizations Documentation',
-          url: 'https://clerk.com/docs/organizations/overview'
-        }
-      ]
+        'The AuthBoot backend enforces membership and RBAC on every admin API call. Server-side permission checks ensure that users can only access resources for their active organization.',
+      links: []
     }
   ]
 };
@@ -57,13 +42,8 @@ export const teamInfoContent: InfobarContent = {
     {
       title: 'Overview',
       description:
-        "The Team Management page allows you to manage your workspace team, including members, roles, security settings, and more. This page provides comprehensive organization management through Clerk's OrganizationProfile component.",
-      links: [
-        {
-          title: 'Clerk Organizations Documentation',
-          url: 'https://clerk.com/docs/organizations/overview'
-        }
-      ]
+        'The Team Management page allows you to manage your workspace team, including members, roles, security settings, and more. Team management will be backed by the AuthBoot membership and invitation APIs.',
+      links: []
     },
     {
       title: 'Managing Team Members',
@@ -74,13 +54,8 @@ export const teamInfoContent: InfobarContent = {
     {
       title: 'Roles and Permissions',
       description:
-        'Configure default roles and permissions in the Clerk Dashboard under Organizations settings. Roles define what actions team members can perform within the workspace. Common roles include admin, member, and custom roles you define.',
-      links: [
-        {
-          title: 'Clerk Organizations Documentation',
-          url: 'https://clerk.com/docs/organizations/overview'
-        }
-      ]
+        'Roles and permissions are defined and enforced by the AuthBoot RBAC backend. Roles define what actions team members can perform within the workspace. Common roles include admin, member, and custom roles.',
+      links: []
     },
     {
       title: 'Security Settings',
@@ -103,64 +78,85 @@ export const teamInfoContent: InfobarContent = {
   ]
 };
 
+export const workspaceSettingsInfoContent: InfobarContent = {
+  title: 'Workspace Settings',
+  sections: [
+    {
+      title: 'Overview',
+      description:
+        'The Workspace Settings page configures the active workspace — its general info (name, code, logo), the sign-in methods available to its members, and ownership actions.',
+      links: []
+    },
+    {
+      title: 'General Settings',
+      description:
+        'Edit the workspace name, code, and logo. The logo can be uploaded directly and is stored by the AuthBoot backend; name and code update the organization record.',
+      links: []
+    },
+    {
+      title: 'Login Methods',
+      description:
+        'Choose which sign-in methods members can use: built-in email/phone, or third-party OAuth providers (WeChat, Alipay, Google, GitHub, Apple). Provider credentials are stored per workspace through the OAuth config API.',
+      links: []
+    },
+    {
+      title: 'Danger Zone',
+      description:
+        'Leave the workspace (losing access until invited back) or delete it permanently. Deleting removes all members, roles, login configurations, and data. Role and membership checks are enforced server-side by the backend.',
+      links: []
+    },
+    {
+      title: 'Active Workspace',
+      description:
+        'Settings always apply to the workspace selected in the header switcher. The page falls back to a hint card when no workspace is active.',
+      links: []
+    }
+  ]
+};
+
 export const billingInfoContent: InfobarContent = {
   title: 'Billing & Plans',
   sections: [
     {
       title: 'Overview',
       description:
-        "The Billing page allows you to manage your organization's subscription and usage limits. Plans and subscriptions are managed through Clerk Billing for B2B, which provides organization-level subscription management with integrated Stripe payment processing.",
-      links: [
-        {
-          title: 'Clerk Billing Documentation',
-          url: 'https://clerk.com/docs/billing/overview'
-        }
-      ]
+        "The Billing page allows you to manage your organization's subscription and usage limits. Plans and subscriptions are not yet wired up — they will be served by the AuthBoot billing API once it ships.",
+      links: []
     },
     {
       title: 'Available Plans',
       description:
-        'View and subscribe to available plans through the pricing table. Plans are created and managed in the Clerk Dashboard. Toggle "Publicly available" on plans to show them in the pricing table. Common plans include free, pro, and team tiers.',
-      links: [
-        {
-          title: 'Clerk Dashboard - Plans',
-          url: 'https://dashboard.clerk.com/~/billing/plans'
-        }
-      ]
+        'View and subscribe to available plans through the pricing table. Plans are created and managed in the AuthBoot backend. This page will list the plans exposed by the billing API.',
+      links: []
     },
     {
       title: 'Plan Features',
       description:
-        'Each plan can include specific features that unlock functionality in the application. Features are added to plans in the Clerk Dashboard and can be checked in code using the `has()` function with `feature` checks.',
+        'Each plan can include specific features that unlock functionality in the application. Features are assigned to plans in the backend and can be checked on the client for navigation visibility (UX only — the backend enforces access on every API call).',
       links: []
     },
     {
       title: 'Access Control',
       description:
-        'Plans and features are used for access control throughout the application. Server-side checks use the `has()` function to verify plan or feature access. Client-side protection uses the `<Show>` component to conditionally render content based on subscription status.',
+        'Plans and features are used for access control throughout the application. Server-side checks are enforced by the AuthBoot backend. Client-side protection uses conditional rendering based on the signed-in organization.',
       links: []
     },
     {
       title: 'Billing Cost Structure',
       description:
-        "Clerk Billing costs 0.7% per transaction, plus transaction fees paid directly to Stripe. Clerk Billing is not the same as Stripe Billing - plans and pricing are managed through the Clerk Dashboard and won't sync with existing Stripe products. Clerk uses Stripe only for payment processing.",
+        'Billing infrastructure is self-hosted: payments, plans, and usage limits are entirely under your control once the billing API is implemented.',
       links: []
     },
     {
       title: 'Setup Requirements',
       description:
-        "To enable billing, navigate to Billing Settings in the Clerk Dashboard and enable billing for your application. Choose between Clerk's development gateway (for testing) or your own Stripe account (for production). Note: A Stripe account created for development cannot be used for production.",
-      links: [
-        {
-          title: 'Billing Settings',
-          url: 'https://dashboard.clerk.com/~/billing/settings'
-        }
-      ]
+        'No external billing provider is required. The AuthBoot backend owns plans and subscriptions; no third-party dashboard configuration is needed.',
+      links: []
     },
     {
-      title: 'Beta Status',
+      title: 'Status',
       description:
-        'Billing is currently in Beta and its APIs are experimental and may undergo breaking changes. To mitigate potential disruptions, we recommend pinning your SDK and `clerk-js` package versions.',
+        'Billing is not implemented yet — the page renders a placeholder until the backend billing endpoints are available.',
       links: []
     }
   ]

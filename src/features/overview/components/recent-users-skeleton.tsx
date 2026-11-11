@@ -1,7 +1,7 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
-export function RecentSalesSkeleton() {
+export function RecentUsersSkeleton() {
   return (
     <Card className='h-full'>
       <CardHeader>
@@ -15,9 +15,9 @@ export function RecentSalesSkeleton() {
               <Skeleton className='h-9 w-9 rounded-full' /> {/* Avatar */}
               <div className='ml-4 space-y-1'>
                 <Skeleton className='h-4 w-[120px]' /> {/* Name */}
-                <Skeleton className='h-4 w-[160px]' /> {/* Email */}
+                <Skeleton className='h-4 w-[160px]' /> {/* Identity */}
               </div>
-              <Skeleton className='ml-auto h-4 w-[80px]' /> {/* Amount */}
+              <Skeleton className='ml-auto h-4 w-[80px]' /> {/* Date */}
             </div>
           ))}
         </div>

@@ -1,7 +1,11 @@
-import { delay } from '@/constants/mock-api';
-import { RecentSales } from '@/features/overview/components/recent-sales';
+import { Suspense } from 'react';
+import { RecentUsers } from '@/features/overview/components/recent-users';
+import { RecentUsersSkeleton } from '@/features/overview/components/recent-users-skeleton';
 
 export default async function Sales() {
-  await delay(3000);
-  return <RecentSales />;
+  return (
+    <Suspense fallback={<RecentUsersSkeleton />}>
+      <RecentUsers />
+    </Suspense>
+  );
 }

@@ -17,6 +17,9 @@ export type User = {
   role: string;
   created_at: string;
   updated_at: string;
+  // Optional backend-only fields (authboot-server org users).
+  avatar?: string;
+  organization_id?: number;
 };
 
 function generateRandomUserData(id: number): User {
@@ -184,6 +187,23 @@ export const fakeUsers = {
       offset,
       limit,
       users: paginatedUsers
+    };
+  },
+
+  async getUserById(id: number) {
+    await delay(800);
+
+    const user = this.records.find((user) => user.id === id);
+
+    if (!user) {
+      return { success: false, message: `User with ID ${id} not found` };
+    }
+
+    return {
+      success: true,
+      time: new Date().toISOString(),
+      message: 'Sample data for testing and learning purposes',
+      user
     };
   }
 };

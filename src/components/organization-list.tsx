@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { useAuth, useOrganizationList } from '@clerk/nextjs';
+import { toast } from 'sonner';
+import { useAuth } from '@/components/auth/auth-provider';
+import { createOrganization as createOrg } from '@/lib/auth-client';
 
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
@@ -23,8 +24,6 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
-type OrganizationListResource = ReturnType<typeof useOrganizationList>;
-
 interface OrganizationListProps {
   afterSelectOrganizationUrl?: string;
   afterCreateOrganizationUrl?: string;
@@ -32,10 +31,8 @@ interface OrganizationListProps {
 }
 
 /**
- * Self-owned replacement for Clerk's <OrganizationList />.
- *
- * Uses the `useOrganizationList` hook plus the project's shadcn components so the
- * layout, states, and copy are fully editable — unlike the black-box Clerk widget.
+ * Self-owned organization list backed by authboot-server's admin
+ * organization API (via /api/auth/organizations).
  */
 export function OrganizationList({
   afterSelectOrganizationUrl = '/dashboard/overview',
@@ -43,21 +40,20 @@ export function OrganizationList({
   className
 }: OrganizationListProps) {
   const router = useRouter();
-  const { orgId } = useAuth();
-  const { isLoaded, setActive, userMemberships, createOrganization } = useOrganizationList({
-    userMemberships: {
-      infinite: true,
-      keepPreviousData: false
-    }
-  });
+  const { organizations, activeOrganizationId, isLoaded, switchOrg, refresh } = useAuth();
 
-  const [selectingId, setSelectingId] = useState<string | null>(null);
+  const [selectingId, setSelectingId] = useState<number | null>(null);
 
-  const handleSelect = async (organizationId: string) => {
-    if (!setActive || selectingId) return;
+  const handleSelect = async (organizationId: number) => {
+    if (selectingId !== null) return;
     setSelectingId(organizationId);
     try {
-      await setActive({ organization: organizationId });
+      const result = await switchOrg(organizationId);
+      if (!result.success) {
+        toast.error(result.message);
+        setSelectingId(null);
+        return;
+      }
       router.push(afterSelectOrganizationUrl);
     } catch (error) {
       console.error('Failed to select organization:', error);
@@ -90,8 +86,6 @@ export function OrganizationList({
     );
   }
 
-  const memberships = userMemberships?.data ?? [];
-
   return (
     <div className={cn('mx-auto w-full max-w-md', className)}>
       <div className='bg-card overflow-hidden rounded-xl border shadow-sm'>
@@ -100,13 +94,12 @@ export function OrganizationList({
           <p className='text-muted-foreground text-sm'>Select a workspace to continue</p>
         </div>
 
-        {memberships.length > 0 ? (
+        {organizations.length > 0 ? (
           <ul className='divide-y'>
-            {memberships.map((membership) => {
-              const org = membership.organization;
-              const isActive = org.id === orgId;
+            {organizations.map((org) => {
+              const isActive = org.id === activeOrganizationId;
               return (
-                <li key={membership.id}>
+                <li key={org.id}>
                   <button
                     type='button'
                     onClick={() => handleSelect(org.id)}
@@ -114,14 +107,9 @@ export function OrganizationList({
                     className='hover:bg-accent flex w-full items-center gap-3 px-5 py-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-70'
                   >
                     <div className='bg-muted flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md'>
-                      {org.hasImage && org.imageUrl ? (
-                        <Image
-                          src={org.imageUrl}
-                          alt={org.name}
-                          width={36}
-                          height={36}
-                          className='size-full object-cover'
-                        />
+                      {org.logo ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={org.logo} alt={org.name} className='size-full object-cover' />
                       ) : (
                         <Icons.galleryVerticalEnd className='size-4' />
                       )}
@@ -129,7 +117,7 @@ export function OrganizationList({
                     <div className='min-w-0 flex-1'>
                       <p className='truncate text-sm font-medium'>{org.name}</p>
                       <p className='text-muted-foreground truncate text-xs capitalize'>
-                        {membership.role}
+                        {org.code || 'Organization'}
                       </p>
                     </div>
                     {selectingId === org.id ? (
@@ -155,10 +143,8 @@ export function OrganizationList({
 
         <div className='border-t'>
           <CreateOrganizationDialog
-            createOrganization={createOrganization}
-            setActive={setActive}
             afterCreateOrganizationUrl={afterCreateOrganizationUrl}
-            onCreated={() => userMemberships?.revalidate?.()}
+            onCreated={() => void refresh()}
           />
         </div>
       </div>
@@ -167,37 +153,41 @@ export function OrganizationList({
 }
 
 interface CreateOrganizationDialogProps {
-  createOrganization: OrganizationListResource['createOrganization'];
-  setActive: OrganizationListResource['setActive'];
   afterCreateOrganizationUrl: string;
   onCreated?: () => void | Promise<void>;
 }
 
 function CreateOrganizationDialog({
-  createOrganization,
-  setActive,
   afterCreateOrganizationUrl,
   onCreated
 }: CreateOrganizationDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
+  const [code, setCode] = useState('');
   const [isPending, setIsPending] = useState(false);
 
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault();
-    const trimmed = name.trim();
-    if (!createOrganization || !trimmed || isPending) return;
+    const trimmedName = name.trim();
+    const trimmedCode = code.trim();
+    if (!trimmedName || !trimmedCode || isPending) return;
     setIsPending(true);
     try {
-      const org = await createOrganization({ name: trimmed });
+      const result = await createOrg(trimmedName, trimmedCode);
+      if (!result.success) {
+        toast.error(result.message);
+        return;
+      }
+      toast.success('Workspace created');
       await onCreated?.();
-      await setActive?.({ organization: org.id });
       setName('');
+      setCode('');
       setOpen(false);
       router.push(afterCreateOrganizationUrl);
     } catch (error) {
       console.error('Failed to create organization:', error);
+      toast.error('Failed to create workspace');
     } finally {
       setIsPending(false);
     }
@@ -209,6 +199,7 @@ function CreateOrganizationDialog({
         render={
           <button
             type='button'
+            aria-label='Create workspace'
             className='hover:bg-accent flex w-full items-center gap-3 px-5 py-3 text-left transition-colors'
           />
         }
@@ -223,7 +214,7 @@ function CreateOrganizationDialog({
           <DialogHeader>
             <DialogTitle>Create workspace</DialogTitle>
             <DialogDescription>
-              Give your new workspace a name. You can invite teammates later.
+              Give your new workspace a name and a unique code. You can invite teammates later.
             </DialogDescription>
           </DialogHeader>
           <div className='grid gap-2 py-4'>
@@ -235,10 +226,21 @@ function CreateOrganizationDialog({
               placeholder='Acme Inc.'
               autoFocus
             />
+            <Label htmlFor='organization-code'>Code</Label>
+            <Input
+              id='organization-code'
+              value={code}
+              onChange={(event) => setCode(event.target.value)}
+              placeholder='acme'
+            />
           </div>
           <DialogFooter>
             <DialogClose render={<Button type='button' variant='outline' />}>Cancel</DialogClose>
-            <LoadingButton type='submit' loading={isPending} disabled={!name.trim()}>
+            <LoadingButton
+              type='submit'
+              loading={isPending}
+              disabled={!name.trim() || !code.trim()}
+            >
               Create
             </LoadingButton>
           </DialogFooter>

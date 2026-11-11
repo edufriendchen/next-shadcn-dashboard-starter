@@ -3,7 +3,7 @@
 /**
  * Fully client-side hook for filtering navigation items based on RBAC
  *
- * This hook uses Clerk's client-side hooks to check permissions, roles, and organization
+ * This hook uses the AuthBoot auth context to check organization/role access
  * without any server calls. This is perfect for navigation visibility (UX only).
  *
  * Performance:
@@ -17,7 +17,7 @@
  */
 
 import { useMemo } from 'react';
-import { useOrganization, useUser } from '@clerk/nextjs';
+import { useAuth } from '@/components/auth/auth-provider';
 import { useTranslations } from '@/components/i18n/active-locale';
 import type { NavItem, NavGroup } from '@/types';
 
@@ -47,23 +47,25 @@ export function useNavLabels() {
  * @returns Filtered items
  */
 export function useFilteredNavItems(items: NavItem[]) {
-  const { organization, membership } = useOrganization();
-  const { user } = useUser();
+  const { user, organizations, activeOrganizationId, isAuthenticated } = useAuth();
 
   // Memoize context and permissions
   const accessContext = useMemo(() => {
-    const permissions = membership?.permissions || [];
-    const role = membership?.role;
+    const organization = activeOrganizationId
+      ? (organizations.find((org) => org.id === activeOrganizationId) ?? null)
+      : null;
 
     return {
-      organization: organization ?? undefined,
+      organization,
       user: user ?? undefined,
-      permissions: permissions as string[],
-      role: role ?? undefined,
-      hasOrg: !!organization
+      permissions: [] as string[],
+      role: undefined as string | undefined,
+      // Org-gated items show once the admin is signed in; the backend enforces
+      // membership on the actual API calls.
+      hasOrg: isAuthenticated
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- using stable primitives to avoid infinite re-renders from unstable Clerk object refs
-  }, [organization?.id, user?.id, membership?.permissions, membership?.role]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- stable primitives to avoid re-renders
+  }, [user, organizations, activeOrganizationId, isAuthenticated]);
 
   // Filter items synchronously (all client-side)
   const filteredItems = useMemo(() => {
@@ -99,7 +101,9 @@ export function useFilteredNavItems(items: NavItem[]) {
           }
         }
 
-        // Note: Plans and features require server-side checks with Clerk's has() function
+        // Note: Plans and features require server-side verification (enforced
+        // by the AuthBoot backend on each API call). For navigation visibility
+        // they are currently allowed through, and the page handles protection.
         // For navigation visibility, you can either:
         // 1. Store plan/feature info in organization metadata (client-accessible)
         // 2. Use server actions (current approach)
